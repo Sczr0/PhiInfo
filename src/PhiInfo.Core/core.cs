@@ -15,7 +15,8 @@ public class PhiInfo
     private readonly AssetsFileInstance level0Inst;
     private readonly AssetsFileInstance level22Inst;
 
-    public string lang = "chinese";
+    static readonly string lang = "chinese";
+    static readonly int langId = 40;
 
     public PhiInfo(
         byte[] globalGameManagers,
@@ -79,9 +80,9 @@ public class PhiInfo
         return null;
     }
 
-    public Dictionary<string, SongInfo> ExtractSongInfo()
+    public List<SongInfo> GetSongInfo()
     {
-        var result = new Dictionary<string, SongInfo>();
+        var result = new List<SongInfo>();
 
         var gameInfoField = FindMonoBehaviour(
             level0Inst,
@@ -137,22 +138,23 @@ public class PhiInfo
 
                 if (levelsDict.Count == 0) continue;
 
-                result[songId.ToString()] = new SongInfo
+                result.Add(new SongInfo
                 {
+                    id = songId,
                     name = song["songsName"].AsString,
                     composer = song["composer"].AsString,
                     illustrator = song["illustrator"].AsString,
                     preview_time = Math.Round(song["previewTime"].AsDouble, 2),
                     preview_end_time = Math.Round(song["previewEndTime"].AsDouble, 2),
                     levels = levelsDict
-                };
+                });
             }
         }
 
         return result;
     }
 
-    public List<Folder> ExtractCollection()
+    public List<Folder> GetCollection()
     {
         var result = new List<Folder>();
 
@@ -194,6 +196,57 @@ public class PhiInfo
                 files = files
             });
          }
+
+        return result;
+    }
+
+    public List<Avatar> GetAvatars()
+    {
+        var result = new List<Avatar>();
+
+        var avatarField = FindMonoBehaviour(
+            level0Inst,
+            "GetCollectionControl"
+        ) ?? throw new Exception("GetCollectionControl MonoBehaviour not found");
+
+        var avatarsArray = avatarField["avatars"]["Array"];
+
+        for (int i = 0; i < avatarsArray.Children.Count; i++)
+        {
+            var avatar = avatarsArray[i];
+            result.Add(new Avatar
+            {
+                name = avatar["name"].AsString,
+                addressable_key = avatar["addressableKey"].AsString
+            });
+        }
+
+        return result;
+    }
+
+    public List<string> GetTips()
+    {
+        var result = new List<string>();
+
+        var tipsField = FindMonoBehaviour(
+            level0Inst,
+            "TipsProvider"
+        ) ?? throw new Exception("TipsProvider MonoBehaviour not found");
+
+        var tipsArray = tipsField["tips"]["Array"];
+
+        for (int i = 0; i < tipsArray.Children.Count; i++)
+        {
+            var tipslang = tipsArray[i];
+            if (tipslang["language"].AsInt == langId)
+            {
+                for (int j = 0; j < tipslang["tips"]["Array"].Children.Count; j++)
+                {
+                    result.Add(tipslang["tips"]["Array"][j].AsString);
+                }
+                break;
+            }
+        }
 
         return result;
     }

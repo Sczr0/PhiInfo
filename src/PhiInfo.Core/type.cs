@@ -1,10 +1,7 @@
 #pragma warning disable IDE1006
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace PhiInfo.Core;
 
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]
 public struct SongLevel
 {
     public string charter { get; set; }
@@ -12,9 +9,9 @@ public struct SongLevel
     public double difficulty { get; set; }
 }
 
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]
 public struct SongInfo
 {
+    public string id { get; set; }
     public string name { get; set; }
     public string composer { get; set; }
     public string illustrator { get; set; }
@@ -23,7 +20,6 @@ public struct SongInfo
     public Dictionary<string, SongLevel> levels { get; set; }
 }
 
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]
 public struct Folder
 {
     public string title { get; set; }
@@ -31,8 +27,6 @@ public struct Folder
     public string cover { get; set; }
     public List<FileItem> files { get; set; }
 }
-
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]
 public struct FileItem
 {
     public string key { get; set; }
@@ -43,4 +37,10 @@ public struct FileItem
     public string category { get; set; }
     public string content { get; set; }
     public string properties { get; set; }
+}
+
+public struct Avatar
+{
+    public string name { get; set; }
+    public string addressable_key { get; set; }
 }
