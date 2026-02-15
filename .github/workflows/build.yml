@@ -36,11 +36,22 @@ jobs:
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
 
+    - name: Download classdata.tpk
+      run: |
+        curl -L -o classdata.zip https://nightly.link/AssetRipper/Tpk/workflows/type_tree_tpk/master/lz4_file.zip
+        unzip classdata.zip
+        mv *.tpk classdata.tpk
+      shell: bash
+
     - name: Publish
       run: dotnet publish src/PhiInfo.CLI/PhiInfo.CLI.csproj -c Release -r ${{ matrix.rid }} -o ./publish
+
+    - name: Copy classdata.tpk to publish dir
+      run: cp classdata.tpk ./publish/
+      shell: bash
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: PhiInfo-${{ matrix.rid }}
-        path: ./publish/${{ matrix.binary_name }}
+        path: ./publish/
